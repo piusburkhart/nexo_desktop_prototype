@@ -1,0 +1,571 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Logi Nexo Desktop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap">
+<style>
+/* Layout: desktop app shell — title bar, then sidebar · editor (optionally split) · actions panel, floating on the canvas. Tokens mirror Nexo DS (Color/Light + Dark). */
+:root{
+  --canvas:#e5e2e0; --surface:#ffffff; --subtle:#f5f4f2; --pressed:#e5e2e0; --inverse:#1b1b1b;
+  --t1:#1b1b1b; --t2:#343331; --t3:#555451; --t4:#7e7c78; --t-inv:#ffffff;
+  --b-subtle:#e5e2e0; --b-default:#d9d6d4; --b-strong:#a19f9a;
+  --lime:#b1ff99; --on-lime:#1b1b1b; --blue:#3a39ff; --orange:#ff6d0f; --green:#00a834; --tomato:#e84a1f;
+  --overlay:rgba(0,0,0,.28);
+  --shadow-xs:0 1px 2px rgba(27,27,27,.06),0 1px 1px rgba(27,27,27,.04);
+  --shadow-s:0 8px 24px rgba(27,27,27,.10),0 2px 6px rgba(27,27,27,.06);
+  --sans:"Figtree","Brown Logitech Pan",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Newsreader","Domaine Text",Georgia,"Times New Roman",serif;
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:24px; --r-full:999px;
+  --s-2xs:2px; --s-xs:4px; --s-sm:8px; --s-md:12px; --s-lg:16px; --s-xl:24px; --s-2xl:32px; --s-4xl:48px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --canvas:#1b1b1b; --surface:#252422; --subtle:#343331; --pressed:#555451; --inverse:#f5f4f2;
+  --t1:#f5f4f2; --t2:#c7c4c3; --t3:#a19f9a; --t4:#7e7c78; --t-inv:#1b1b1b;
+  --b-subtle:#343331; --b-default:#555451; --b-strong:#7e7c78; --overlay:rgba(0,0,0,.5);
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4); --shadow-s:0 10px 30px rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --canvas:#1b1b1b; --surface:#252422; --subtle:#343331; --pressed:#555451; --inverse:#f5f4f2;
+  --t1:#f5f4f2; --t2:#c7c4c3; --t3:#a19f9a; --t4:#7e7c78; --t-inv:#1b1b1b;
+  --b-subtle:#343331; --b-default:#555451; --b-strong:#7e7c78; --overlay:rgba(0,0,0,.5);
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4); --shadow-s:0 10px 30px rgba(0,0,0,.5); color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--canvas);color:var(--t1);font-family:var(--sans);font-size:14px;line-height:1.4;overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+svg{display:block;flex:none}
+.ico{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ico-sm{width:14px;height:14px}
+.ico-lg{width:20px;height:20px}
+.label{font-size:10px;line-height:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--t3)}
+.muted{color:var(--t3)}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- shell ---------- */
+.app{height:100%;display:flex;flex-direction:column}
+.titlebar{height:52px;display:grid;grid-template-columns:1fr minmax(0,480px) 1fr;align-items:center;gap:var(--s-md);flex:none}
+.tb-left,.tb-right{display:flex;align-items:center;gap:var(--s-lg);min-width:0}
+.tb-right{justify-content:flex-end;gap:var(--s-xs)}
+.layout-btns{display:flex;gap:4px}
+.lights{display:flex;gap:8px}
+.lights i{width:12px;height:12px;border-radius:50%;display:block}
+.lights i:nth-child(1){background:var(--tomato)}.lights i:nth-child(2){background:var(--orange)}.lights i:nth-child(3){background:var(--green)}
+.appname{color:var(--t2)}
+.cmd{height:36px;display:flex;align-items:center;gap:var(--s-sm);padding:0 var(--s-sm) 0 var(--s-lg);background:var(--surface);border-radius:var(--r-full);box-shadow:var(--shadow-xs);color:var(--t3);width:100%;text-align:left}
+.cmd span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kbd{font-size:12px;padding:2px 8px;border-radius:var(--r-sm);background:var(--subtle);color:var(--t3)}
+.iconbtn{width:32px;height:32px;display:grid;place-items:center;border-radius:var(--r-sm);color:var(--t2)}
+.iconbtn:hover{background:color-mix(in srgb,var(--t1) 8%,transparent)}
+.iconbtn[aria-pressed="true"]{background:var(--surface);color:var(--t1);box-shadow:var(--shadow-xs)}
+
+.body{flex:1;min-height:0;display:flex;gap:var(--s-md);padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
+.panel{background:var(--surface);border-radius:var(--r-lg);min-height:0;overflow:hidden;display:flex;flex-direction:column}
+
+/* ---------- sidebar ---------- */
+.sidebar{width:296px;flex:none;background:var(--subtle);flex-direction:row}
+.rail{width:52px;flex:none;display:flex;flex-direction:column;align-items:center;gap:var(--s-xs);padding:var(--s-md) 0;border-right:1px solid var(--b-subtle)}
+.railbtn{width:36px;height:36px;border-radius:var(--r-md);display:grid;place-items:center;color:var(--t3)}
+.railbtn[aria-current="true"]{background:var(--surface);color:var(--t1);box-shadow:var(--shadow-xs)}
+.railbtn:hover{color:var(--t1)}
+.rail .spacer{flex:1}
+.avatar{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:600;color:#fff;flex:none}
+.avatar.lg{width:24px;height:24px;font-size:11px}
+.av-thuy{background:linear-gradient(135deg,#c9a28a,#7e5a46)}
+.av-blue{background:var(--blue)}.av-green{background:var(--green);color:#1b1b1b}.av-orange{background:var(--orange);color:#1b1b1b}.av-tomato{background:var(--tomato);color:#1b1b1b}
+.tree{flex:1;min-width:0;overflow:auto;padding:var(--s-md) var(--s-sm);display:flex;flex-direction:column;gap:2px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;padding:var(--s-lg) var(--s-sm) var(--s-xs)}
+.sec-h:first-child{padding-top:var(--s-sm)}
+.row{display:flex;align-items:center;gap:var(--s-sm);height:32px;border-radius:var(--r-md);padding-right:var(--s-sm);text-align:left;width:100%;color:var(--t1)}
+.row:hover{background:color-mix(in srgb,var(--t1) 6%,transparent)}
+.row[aria-current="true"]{background:var(--surface);box-shadow:var(--shadow-xs)}
+.row .name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .meta{font-size:12px;color:var(--t3)}
+.row .chev{width:14px;height:14px;color:var(--t3);transition:transform .15s}
+.row .chev.open{transform:rotate(90deg)}
+.row .gap14{width:14px;flex:none}
+.row.sub .name{color:var(--t2)}
+
+/* ---------- editor ---------- */
+.editors{flex:1;min-width:0;display:flex;gap:var(--s-md)}
+.editor{flex:1;min-width:0}
+.tabbar{display:flex;align-items:stretch;background:var(--subtle);flex:none;min-height:44px}
+.tabs{display:flex;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:var(--s-sm);padding:0 var(--s-md) 0 var(--s-lg);color:var(--t2);white-space:nowrap;position:relative}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--t1)}
+.tab .x{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;color:var(--t3);opacity:.6}
+.tab .x:hover{background:var(--pressed);opacity:1}
+.tab .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);margin:0 6px}
+.tabbar .grow{flex:1}
+.tabbar .tools{display:flex;align-items:center;gap:var(--s-xs);padding:0 var(--s-sm)}
+.crumbs{display:flex;align-items:center;gap:var(--s-xs);padding:var(--s-md) var(--s-xl);border-bottom:1px solid var(--b-subtle);font-size:12px;color:var(--t3);flex:none;white-space:nowrap;overflow:hidden}
+.crumbs b{font-weight:400;color:var(--t1)}
+.scroll{flex:1;min-height:0;overflow:auto}
+.doc{max-width:760px;padding:var(--s-2xl) var(--s-4xl) var(--s-4xl);display:flex;flex-direction:column;gap:var(--s-xl)}
+.split .doc{padding-inline:var(--s-2xl)}
+.doc h1{font-size:28px;line-height:34px;font-weight:400;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.metarow{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-xs) var(--s-lg);font-size:12px;color:var(--t2);margin-top:calc(var(--s-md) - var(--s-xl))}
+.metarow span{display:flex;align-items:center;gap:var(--s-xs)}
+.stack{display:flex}
+.stack .avatar{box-shadow:0 0 0 2px var(--surface)}
+.stack .avatar+.avatar{margin-left:-6px}
+.lead{font-size:22px;line-height:30px;margin:0;max-width:62ch;text-wrap:pretty}
+.split .lead{font-size:18px;line-height:27px}
+.sect{display:flex;flex-direction:column;gap:var(--s-md)}
+.points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.points li{display:grid;grid-template-columns:24px 1fr auto;column-gap:var(--s-sm);align-items:start;font-family:var(--serif);font-weight:300;font-size:16px;line-height:30px;letter-spacing:.01em}
+.points li::before{content:"•";text-align:center;color:var(--t2)}
+.ts{font-family:var(--sans);font-size:12px;line-height:14px;padding:3px 7px;border-radius:var(--r-full);background:var(--surface);box-shadow:0 0 0 1px var(--b-default),0 1px 0 var(--b-default);color:var(--t1);margin-top:6px;white-space:nowrap}
+.ts:hover{background:var(--subtle)}
+.ts:active{box-shadow:0 0 0 1px var(--b-default)}
+
+/* transcript */
+.tr{padding:var(--s-xl);display:flex;flex-direction:column;gap:var(--s-xs);max-width:760px}
+.player{display:flex;align-items:center;gap:var(--s-md);height:40px;padding:0 var(--s-md) 0 4px;border-radius:var(--r-full);background:var(--subtle);margin-bottom:var(--s-md)}
+.play{width:32px;height:32px;border-radius:50%;background:var(--surface);display:grid;place-items:center;box-shadow:var(--shadow-xs);color:var(--t1)}
+.wave{flex:1;height:20px;display:flex;align-items:center;gap:2px;min-width:0;overflow:hidden}
+.wave i{display:block;width:2px;border-radius:2px;background:var(--b-strong);flex:none}
+.wave i.on{background:var(--t1)}
+.clock{font-size:12px;color:var(--t3)}
+.seg{display:grid;align-items:start;grid-template-columns:44px 1fr;gap:var(--s-md);padding:var(--s-sm) var(--s-md);border-radius:var(--r-md);transition:background .25s}
+.seg .time{font-size:14px;color:var(--t3);padding-top:22px;text-align:left}
+.seg .time:hover{color:var(--t1);text-decoration:underline}
+.seg .who{display:flex;align-items:center;gap:var(--s-xs);font-size:12px;color:var(--t2);height:18px}
+.seg p{margin:2px 0 0;font-family:var(--serif);font-weight:300;font-size:16px;line-height:28px;letter-spacing:.01em}
+.seg.now{background:var(--subtle)}
+.seg.hit{background:color-mix(in srgb,var(--lime) 40%,var(--surface))}
+.empty{display:grid;place-items:center;text-align:center;color:var(--t3);height:100%;padding:var(--s-2xl)}
+
+/* ---------- actions ---------- */
+.actions{width:340px;flex:none}
+.ap-h{display:flex;align-items:center;gap:var(--s-sm);padding:var(--s-lg) var(--s-lg) var(--s-md)}
+.ap-h h2{font-size:18px;line-height:22px;font-weight:400;margin:0}
+.count{font-size:10px;font-weight:500;padding:2px 7px;border-radius:var(--r-full);background:var(--subtle);color:var(--t2)}
+.ap-h .grow{flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:var(--s-sm);padding:0 var(--s-lg) var(--s-md)}
+.chip{height:32px;padding:0 var(--s-md);border-radius:var(--r-full);border:1px solid var(--b-strong);color:var(--t1);background:var(--canvas)}
+.chip[aria-pressed="true"]{background:var(--inverse);color:var(--t-inv);border-color:var(--inverse)}
+.feed{flex:1;min-height:0;overflow:auto;padding:var(--s-sm) var(--s-lg) var(--s-lg);display:flex;flex-direction:column;gap:var(--s-xl)}
+.group{display:flex;flex-direction:column;gap:var(--s-sm)}
+.src{display:flex;align-items:center;gap:var(--s-xs);font-size:12px;color:var(--t2)}
+.src button{flex:1;min-width:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.src button:hover{text-decoration:underline}
+.act{background:var(--subtle);border-radius:var(--r-lg);padding:var(--s-md);display:flex;flex-direction:column;gap:var(--s-md)}
+.act-top{display:flex;align-items:center;gap:var(--s-md);text-align:left;width:100%}
+.appic{width:32px;height:32px;border-radius:50%;background:var(--surface);display:grid;place-items:center;flex:none}
+.act-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.act-title{color:var(--t1)}
+.act-meta{font-size:12px;color:var(--t3)}
+.tag{font-size:12px;padding:4px 10px;border-radius:var(--r-sm);background:var(--lime);color:var(--on-lime);flex:none}
+.check{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--b-strong);display:grid;place-items:center;flex:none;color:var(--t-inv)}
+.act.done .check{background:var(--inverse);border-color:var(--inverse)}
+.act.done{opacity:.6}
+.act.done .act-title{text-decoration:line-through}
+.act-details{display:flex;flex-direction:column;gap:var(--s-sm);padding-left:44px;font-size:12px;color:var(--t2)}
+.act-details span{display:flex;align-items:center;gap:var(--s-xs)}
+.btn{height:48px;border-radius:var(--r-full);background:var(--surface);box-shadow:0 0 0 1px var(--b-default);color:var(--t1);font-size:16px;width:100%}
+.btn:hover{background:var(--canvas)}
+.btn.text{height:32px;width:auto;box-shadow:none;background:none;font-size:14px;padding:0 var(--s-sm);color:var(--t2)}
+.composer{padding:var(--s-md) var(--s-lg) var(--s-lg);flex:none}
+.composer form{display:flex;align-items:center;gap:var(--s-sm);height:40px;padding:0 var(--s-lg);border-radius:var(--r-full);background:var(--subtle)}
+.composer input{flex:1;min-width:0;border:0;background:none;outline:none}
+.composer input::placeholder{color:var(--t3)}
+.actions.collapsed{width:56px;align-items:center;padding:var(--s-md) 0;gap:var(--s-md)}
+.badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:var(--r-full);background:var(--inverse);color:var(--t-inv)}
+.mini{width:36px;height:36px;border-radius:50%;background:var(--subtle);display:grid;place-items:center}
+.rule{width:24px;height:1px;background:var(--b-subtle)}
+
+/* ---------- overlays ---------- */
+.scrim{position:fixed;inset:0;background:var(--overlay);z-index:30;display:grid;place-items:start center;padding:12vh max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.palette{width:min(560px,100%);background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-s);overflow:hidden}
+.palette .in{display:flex;align-items:center;gap:var(--s-sm);padding:var(--s-lg);border-bottom:1px solid var(--b-subtle)}
+.palette input{flex:1;border:0;outline:none;background:none;font-size:16px}
+.palette ul{list-style:none;margin:0;padding:var(--s-sm);max-height:50vh;overflow:auto}
+.palette li button{display:flex;align-items:center;gap:var(--s-md);width:100%;padding:var(--s-sm) var(--s-md);border-radius:var(--r-md);text-align:left}
+.palette li button[aria-selected="true"],.palette li button:hover{background:var(--subtle)}
+.palette .k{margin-left:auto;font-size:12px;color:var(--t3)}
+.toast{position:fixed;left:50%;bottom:max(24px,calc(env(safe-area-inset-bottom,0px) + 16px));transform:translateX(-50%);background:var(--inverse);color:var(--t-inv);padding:10px 16px;border-radius:var(--r-full);z-index:40;box-shadow:var(--shadow-s);max-width:calc(100% - 32px);font-size:14px}
+.drawer-scrim{position:fixed;inset:0;background:var(--overlay);z-index:20}
+
+/* ---------- responsive ---------- */
+.only-narrow{display:none}
+@media (max-width:1180px){ .split-toggle{display:none} }
+@media (max-width:900px){
+  .titlebar{grid-template-columns:auto minmax(0,1fr) auto}
+  .appname,.lights,.layout-btns{display:none}
+  .only-narrow{display:grid}
+  .sidebar,.actions{position:fixed;top:60px;bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:25;box-shadow:var(--shadow-s);display:none}
+  .sidebar{left:max(16px,env(safe-area-inset-left,0px));width:min(296px,calc(100% - 32px))}
+  .actions{right:max(16px,env(safe-area-inset-right,0px));width:min(340px,calc(100% - 32px))}
+  .sidebar.open,.actions.open{display:flex}
+  .actions.collapsed{width:min(340px,calc(100% - 32px));align-items:stretch;padding:0}
+  .doc{padding:var(--s-xl) var(--s-lg) var(--s-2xl)}
+  .lead{font-size:18px;line-height:27px}
+  .kbd{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <header class="titlebar">
+    <div class="tb-left">
+      <div class="lights" aria-hidden="true"><i></i><i></i><i></i></div>
+      <button class="iconbtn only-narrow" id="open-sidebar" aria-label="Show library"><svg class="ico ico-lg" viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+      <span class="appname">Logi Nexo</span>
+    </div>
+    <button class="cmd" id="cmd" aria-label="Search recordings, transcripts and actions">
+      <svg class="ico" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>
+      <span>Search recordings, transcripts and actions</span><span class="kbd">⌘K</span>
+    </button>
+    <div class="tb-right">
+      <div class="layout-btns">
+        <button class="iconbtn" id="t-sidebar" aria-pressed="true" aria-label="Toggle library"><svg class="ico" viewBox="0 0 16 16"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M6 2.5v11"/></svg></button>
+        <button class="iconbtn split-toggle" id="t-split" aria-pressed="false" aria-label="Open transcript beside summary"><svg class="ico" viewBox="0 0 16 16"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M8 2.5v11"/></svg></button>
+        <button class="iconbtn" id="t-actions" aria-pressed="true" aria-label="Toggle actions panel"><svg class="ico" viewBox="0 0 16 16"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M10 2.5v11"/></svg></button>
+      </div>
+      <button class="iconbtn only-narrow" id="open-actions" aria-label="Show actions"><svg class="ico ico-lg" viewBox="0 0 20 20"><path d="M4 10.5l3.5 3.5L16 6"/></svg></button>
+      <button class="iconbtn" id="t-theme" aria-label="Switch light or dark"><svg class="ico" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v11" /><path d="M8 2.5a5.5 5.5 0 0 1 0 11z" fill="currentColor"/></svg></button>
+    </div>
+  </header>
+  <main class="body">
+    <nav class="panel sidebar" id="sidebar" aria-label="Library"></nav>
+    <div class="editors" id="editors"></div>
+    <aside class="panel actions" id="actions" aria-label="Actions"></aside>
+  </main>
+</div>
+<div id="layer"></div>
+
+<script>
+(() => {
+/* ---------------- icons ---------------- */
+const I = {
+  folder:'<svg class="ico" viewBox="0 0 16 16"><path d="M2 4.5a1 1 0 0 1 1-1h3l1.5 1.5H13a1 1 0 0 1 1 1V12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/></svg>',
+  mic:'<svg class="ico" viewBox="0 0 16 16"><rect x="6" y="2" width="4" height="7.5" rx="2"/><path d="M3.5 8a4.5 4.5 0 0 0 9 0M8 12.5V14"/></svg>',
+  memo:'<svg class="ico" viewBox="0 0 16 16"><path d="M3 3.5h10v7H7l-3 2.5v-2.5H3z"/></svg>',
+  doc:'<svg class="ico" viewBox="0 0 16 16"><path d="M4 2h5l3 3v9H4z"/><path d="M9 2v3h3M6 8.5h4M6 11h4"/></svg>',
+  list:'<svg class="ico" viewBox="0 0 16 16"><path d="M6 4.5h7M6 8h7M6 11.5h7M3 4.5h.01M3 8h.01M3 11.5h.01"/></svg>',
+  chev:'<svg class="ico chev" viewBox="0 0 16 16"><path d="m6 4 4 4-4 4"/></svg>',
+  x:'<svg class="ico ico-sm" viewBox="0 0 16 16"><path d="m4.5 4.5 7 7M11.5 4.5l-7 7"/></svg>',
+  timer:'<svg class="ico ico-sm" viewBox="0 0 16 16"><circle cx="8" cy="9" r="5"/><path d="M8 6.5V9l1.5 1.5M6.5 2h3"/></svg>',
+  people:'<svg class="ico ico-lg" viewBox="0 0 20 20"><circle cx="8" cy="7" r="3"/><path d="M2.5 16a5.5 5.5 0 0 1 11 0M13 4.5a3 3 0 0 1 0 5.5M15 12.5a5 5 0 0 1 2.5 3.5"/></svg>',
+  lib:'<svg class="ico ico-lg" viewBox="0 0 20 20"><path d="M2.5 5.5a1 1 0 0 1 1-1h4l2 2h7a1 1 0 0 1 1 1V15a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1z"/></svg>',
+  rec:'<svg class="ico ico-lg" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3" fill="currentColor"/></svg>',
+  gear:'<svg class="ico ico-lg" viewBox="0 0 20 20"><circle cx="10" cy="10" r="2.5"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/></svg>',
+  plus:'<svg class="ico" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>',
+  more:'<svg class="ico" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r=".8" fill="currentColor"/><circle cx="8" cy="8" r=".8" fill="currentColor"/><circle cx="12.5" cy="8" r=".8" fill="currentColor"/></svg>',
+  split:'<svg class="ico" viewBox="0 0 16 16"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M8 2.5v11"/></svg>',
+  play:'<svg class="ico" viewBox="0 0 16 16"><path d="M5.5 3.5v9l7-4.5z" fill="currentColor" stroke="none"/></svg>',
+  pause:'<svg class="ico" viewBox="0 0 16 16"><path d="M5 3.5v9M11 3.5v9" stroke-width="2.4"/></svg>',
+  check:'<svg class="ico ico-sm" viewBox="0 0 16 16" style="stroke-width:2.2"><path d="m3.5 8.5 3 3 6-7"/></svg>',
+  filter:'<svg class="ico" viewBox="0 0 16 16"><path d="M2.5 4.5h11M4.5 8h7M6.5 11.5h3"/></svg>',
+  expand:'<svg class="ico" viewBox="0 0 16 16"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M10 2.5v11M6.5 6 5 8l1.5 2"/></svg>',
+  search:'<svg class="ico" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>',
+};
+/* generic app glyphs (not brand marks) */
+const APPS = {
+  calendar:{name:'Calendar', color:'var(--blue)', svg:c=>`<svg class="ico" viewBox="0 0 16 16" style="color:${c}"><rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg>`},
+  mail:{name:'Gmail', color:'var(--tomato)', svg:c=>`<svg class="ico" viewBox="0 0 16 16" style="color:${c}"><rect x="2" y="3.5" width="12" height="9" rx="1.5"/><path d="m2.5 4.5 5.5 4 5.5-4"/></svg>`},
+  tasks:{name:'Tasks', color:'var(--blue)', svg:c=>`<svg class="ico" viewBox="0 0 16 16" style="color:${c}"><circle cx="8" cy="8" r="5.5"/><path d="m5.5 8 2 2 3.5-4"/></svg>`},
+  slack:{name:'Slack', color:'var(--green)', svg:c=>`<svg class="ico" viewBox="0 0 16 16" style="color:${c}"><path d="M6 2.5v11M10 2.5v11M2.5 6h11M2.5 10h11"/></svg>`},
+  teams:{name:'Teams', color:'var(--blue)', svg:c=>`<svg class="ico" viewBox="0 0 16 16" style="color:${c}"><circle cx="6" cy="6" r="2"/><circle cx="11" cy="6.5" r="1.5"/><path d="M2.5 13a3.5 3.5 0 0 1 7 0M9.5 11.5a2.5 2.5 0 0 1 4.5 1.5"/></svg>`},
+};
+const appIcon = k => APPS[k].svg(APPS[k].color);
+
+/* ---------------- data (sample) ---------------- */
+const PEOPLE = {
+  thuy:{name:'Thuy',cls:'av-thuy',ini:''}, kristian:{name:'Kristian',cls:'av-blue',ini:'K'},
+  agilan:{name:'Agilan',cls:'av-green',ini:'A'}, pius:{name:'Pius',cls:'av-orange',ini:'P'}, tianyi:{name:'Tianyi',cls:'av-tomato',ini:'T'}
+};
+const av = (id,lg) => { const p=PEOPLE[id]; return `<span class="avatar ${p.cls}${lg?' lg':''}" title="${p.name}">${p.ini}</span>`; };
+const FOLDERS = [ {id:'nexo',name:'Logi Nexo'}, {id:'swar',name:'Swarovski Optics'}, {id:'px',name:'Project X'} ];
+const REC = [
+ {id:'eow',folder:'nexo',kind:'mic',title:'Logi x Above End of week Review',short:'End of week Review',date:'26 Sep 2026 · 14:00',day:'26 Sep',dur:'42 min',secs:2520,people:['thuy','kristian','agilan','pius'],
+  lead:'The team compared competitor approaches (Pocket, Notion, Claude) to AI chat and debated bringing similar in-recording search to Nexo without making the AI feel like a person. The current search button was described as nearly useless, while competitor UIs feel overly complex.',
+  points:[['All three competitors offer chat inside a recording; none separate search from Q&A.','00:14'],['Search should find moments, not answer questions. Keep the AI out of first person.','01:26'],['Desktop users want several recordings open at once to cross-reference.','02:09']],
+  decisions:[['Prototype in-recording search with highlighted matches in the transcript.','01:26'],['Park the chat concept until after the search test round.','01:58']],
+  questions:[['Should search results open as their own tab or filter the transcript in place?',null]],
+  transcript:[['00:00','thuy','Alright, I think we’re all here. Let’s go through what we found this week.'],['00:14','kristian','I spent most of the time in Pocket, Notion and Claude, looking at how they handle chat inside a recording.'],['00:41','thuy','And did any of them separate search from asking questions?'],['00:47','kristian','Not really. Every competitor merges the two, which is where it starts to feel like talking to a person.'],['01:12','agilan','Our search button is nearly useless right now, honestly. It just filters titles.'],['01:26','pius','So the idea would be search that jumps to moments, with the matches highlighted right here in the transcript.'],['01:58','thuy','I like that. It keeps the AI out of first person. Let’s park chat until we’ve tested search.'],['02:09','agilan','And on desktop you could have the summary open next to it while you scrub through.'],['02:31','kristian','I can set up a follow up with Logi for next week to show where we landed.']]},
+ {id:'q2',folder:'nexo',kind:'mic',title:'Q2 Business Update',short:'Q2 Business Update',date:'25 Sep 2026 · 10:00',day:'25 Sep',dur:'31 min',secs:1860,people:['thuy','tianyi','pius'],unread:true,
+  lead:'Q2 closed slightly ahead of plan, driven by the Swarovski retainer. Hiring for a second product designer moves to Q4, and the team agreed to share the numbers more openly in the core channel.',
+  points:[['Revenue landed 6% above the Q2 forecast.','00:22'],['Swarovski Optics is now the largest account by hours.','03:40'],['Second designer hire moves to Q4.','07:12']],
+  decisions:[['Share the Q2 numbers in #nexo-core this week.','09:05']],questions:[['Do we plan Q3 as one session or per account?',null]],
+  transcript:[['00:00','tianyi','Quick one today. Q2 is closed, so let’s look at where we ended up.'],['00:22','tianyi','We’re about six percent above the forecast we set in April.'],['03:40','pius','Most of that is Swarovski. They’re the biggest account by hours now.'],['07:12','thuy','Given that, I’d push the second designer hire to Q4.'],['09:05','tianyi','Agreed. And let’s share these numbers in the core channel this week.']]},
+ {id:'brain',folder:'nexo',kind:'memo',title:'Brainstorm: user journey',short:'Brainstorm memo',date:'24 Sep 2026 · 08:12',day:'24 Sep',dur:'4 min',secs:240,people:['thuy'],
+  lead:'A voice memo on the commute: the journey should start on the device, not in the app. The app’s job is to hand you over to the right tool as fast as possible.',
+  points:[['The keychain button is the real start of every journey.','00:30'],['Each recording should end in at least one springboard action.','01:45']],decisions:[],questions:[['What does the app show when there are no actions?',null]],
+  transcript:[['00:00','thuy','Note to self on the user journey.'],['00:30','thuy','The journey starts when you press the button on the keychain, not when you open the app.'],['01:45','thuy','Every recording should end in at least one action that takes you somewhere else.']]},
+ {id:'kick',folder:'swar',kind:'mic',title:'Kick-off workshop',short:'Kick-off workshop',date:'22 Sep 2026 · 09:30',day:'22 Sep',dur:'1 h 12 min',secs:4320,people:['thuy','agilan','pius'],
+  lead:'Kick-off with the Swarovski Optics team. We aligned on the store-visit research plan and agreed to invite the optics team to the first review.',
+  points:[['Research starts with three store visits in Vienna.','05:10'],['The optics team wants to review early concepts.','41:02']],decisions:[['First review with the optics team on 6 Oct.','58:30']],questions:[],
+  transcript:[['05:10','agilan','We’ll start with three store visits in Vienna and collect photos on the way.'],['41:02','pius','They asked to see concepts early, so let’s invite the optics team to the first review.'],['58:30','thuy','Then the first review is the sixth of October.']]},
+ {id:'weekly',folder:'swar',kind:'mic',title:'Weekly sync',short:'Weekly sync',date:'19 Sep 2026 · 11:00',day:'19 Sep',dur:'24 min',secs:1440,people:['thuy','pius'],
+  lead:'Short weekly sync. Store visit dates are confirmed and the photo collection is shared in the project folder.',points:[['Store visits confirmed for next week.','02:15']],decisions:[],questions:[],
+  transcript:[['02:15','pius','Store visits are confirmed for next week, all three of them.']]},
+ {id:'road',folder:'px',kind:'mic',title:'Roadmap review',short:'Roadmap review',date:'12 Sep 2026 · 15:00',day:'12 Sep',dur:'55 min',secs:3300,people:['thuy','tianyi','kristian'],
+  lead:'Reviewed the Project X roadmap. Two milestones slip by a sprint; the rest holds.',points:[['Milestones 3 and 4 slip by one sprint.','12:40']],decisions:[],questions:[],
+  transcript:[['12:40','tianyi','Milestones three and four slip by one sprint. Everything else holds.']]},
+];
+const R = id => REC.find(r=>r.id===id);
+let ACTIONS = [
+ {id:1,rec:'eow',app:'calendar',title:'Set up a follow up meeting with Logi',meta:'Calendar · Fri 3 Oct',tag:true,cta:'Go to calendar',details:{when:'Fri 3 Oct · 13:00–14:00',who:['thuy','kristian','agilan'],note:'Said at 02:31 by Kristian'}},
+ {id:2,rec:'eow',app:'mail',title:'Send summary to Swarovski team',meta:'Gmail · draft ready',tag:true,cta:'Review draft in Gmail',details:{when:'To: optics-team@…',who:[],note:'Draft includes summary and key points'}},
+ {id:3,rec:'eow',app:'tasks',title:'Prototype in-recording search',meta:'Tasks · Pius',cta:'Open in Tasks',details:{when:'Due Fri 3 Oct',who:['pius'],note:'Decision at 01:26'}},
+ {id:4,rec:'q2',app:'slack',title:'Share Q2 numbers in #nexo-core',meta:'Slack · today',cta:'Open Slack',details:{when:'Message drafted',who:['tianyi'],note:'Decision at 09:05'}},
+ {id:5,rec:'q2',app:'calendar',title:'Book Q3 planning session',meta:'Calendar · next week',cta:'Go to calendar',details:{when:'Suggested: Tue 30 Sep · 10:00',who:['thuy','tianyi','pius'],note:'Open question from the meeting'}},
+ {id:6,rec:'kick',app:'tasks',title:'Collect store visit photos',meta:'Tasks · Agilan',done:true,cta:'Open in Tasks',details:{when:'Done 25 Sep',who:['agilan'],note:'Said at 05:10'}},
+ {id:7,rec:'kick',app:'teams',title:'Invite optics team to review',meta:'Teams · sent',done:true,cta:'Open Teams',details:{when:'Mon 6 Oct · 10:00',who:['pius'],note:'Said at 41:02'}},
+ {id:8,rec:'brain',app:'tasks',title:'Sketch the empty state with no actions',meta:'Tasks · Thuy',cta:'Open in Tasks',details:{when:'No due date',who:['thuy'],note:'Open question in memo'}},
+];
+let nextId = 100;
+
+/* ---------------- state ---------------- */
+const store = { get(k,d){try{const v=localStorage.getItem('nexo.'+k);return v===null?d:JSON.parse(v)}catch(e){return d}}, set(k,v){try{localStorage.setItem('nexo.'+k,JSON.stringify(v))}catch(e){}} };
+const S = {
+  tabs:[{rec:'eow',view:'summary'},{rec:'eow',view:'transcript'},{rec:'q2',view:'summary'},{rec:'brain',view:'summary'}],
+  active:0, split:false, sidebar:true, actionsOpen:true,
+  openFolders:{nexo:true,swar:false,px:false}, openRecs:{eow:true},
+  filter:'open', expanded:1, hit:null, playing:false, t:0, rail:'lib',
+  theme: store.get('theme', null), narrowSide:false, narrowActs:false,
+};
+if (S.theme) document.documentElement.dataset.theme = S.theme;
+if (window.innerWidth < 1180) S.actionsOpen = false;
+const cur = () => S.tabs[S.active];
+
+/* ---------------- render: sidebar ---------------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function renderSidebar(){
+  const c = cur();
+  let h = `<div class="rail">
+    <button class="railbtn" data-rail="lib" aria-current="${S.rail==='lib'}" aria-label="Library">${I.lib}</button>
+    <button class="railbtn" data-rail="people" aria-current="${S.rail==='people'}" aria-label="People">${I.people}</button>
+    <button class="railbtn" data-act="record" aria-label="Record">${I.rec}</button>
+    <span class="spacer"></span>
+    <button class="railbtn" data-act="settings" aria-label="Settings">${I.gear}</button>
+    <span class="avatar lg av-blue" style="margin-top:4px">H</span></div><div class="tree">`;
+  if (S.rail==='lib'){
+    h += `<div class="sec-h"><span class="label">Folders</span><span class="label">${FOLDERS.length}</span></div>`;
+    for (const f of FOLDERS){
+      const recs = REC.filter(r=>r.folder===f.id), open = S.openFolders[f.id];
+      h += `<button class="row" style="padding-left:8px" data-folder="${f.id}" aria-expanded="${!!open}">${I.chev.replace('chev','chev'+(open?' open':''))}${I.folder}<span class="name">${f.name}</span><span class="meta tnum">${recs.length}</span></button>`;
+      if (open) for (const r of recs){
+        const ro = S.openRecs[r.id];
+        h += `<button class="row" style="padding-left:24px" data-rec="${r.id}" aria-expanded="${!!ro}">${I.chev.replace('chev','chev'+(ro?' open':''))}${r.kind==='memo'?I.memo:I.mic}<span class="name">${esc(r.title)}</span><span class="meta tnum">${r.day}</span></button>`;
+        if (ro) for (const v of ['summary','transcript']){
+          const sel = c && c.rec===r.id && c.view===v;
+          h += `<button class="row sub" style="padding-left:40px" data-open="${r.id}:${v}" aria-current="${sel}"><span class="gap14"></span>${v==='summary'?I.doc:I.list}<span class="name">${v==='summary'?'Summary':'Transcript'}</span>${v==='transcript'?`<span class="meta tnum">${r.dur}</span>`:''}</button>`;
+        }
+      }
+    }
+  }
+  h += `<div class="sec-h"><span class="label">People</span><span class="label">${Object.keys(PEOPLE).length}</span></div>`;
+  for (const [id,p] of Object.entries(PEOPLE)){
+    const n = REC.filter(r=>r.people.includes(id)).length;
+    h += `<button class="row" style="padding-left:10px" data-person="${id}">${av(id)}<span class="name">${p.name}</span><span class="meta tnum">${n}</span></button>`;
+  }
+  h += `</div>`;
+  $('#sidebar').innerHTML = h;
+}
+
+/* ---------------- render: editors ---------------- */
+function tsChip(r,ts){ return ts?`<button class="ts tnum" data-ts="${r.id}|${ts}" aria-label="Jump to ${ts} in transcript">${ts}</button>`:'<span></span>'; }
+function summaryHTML(r){
+  const ppl = r.people.map(p=>av(p)).join('');
+  const sec = (label,items) => items.length?`<section class="sect"><span class="label">${label}</span><ul class="points">${items.map(([t,ts])=>`<li><span>${esc(t)}</span>${tsChip(r,ts)}</li>`).join('')}</ul></section>`:'';
+  return `<article class="doc"><h1>${esc(r.title)}</h1>
+   <div class="metarow"><span>${I.mic.replace('ico','ico ico-sm')} ${r.date}</span><span>${I.timer} ${r.dur}</span><span>${I.folder.replace('ico','ico ico-sm')} ${FOLDERS.find(f=>f.id===r.folder).name}</span><span class="stack">${ppl}</span></div>
+   <section class="sect"><span class="label">Summary</span><p class="lead">${esc(r.lead)}</p></section>
+   ${sec('Key points',r.points)}${sec('Decisions',r.decisions)}${sec('Open questions',r.questions)}</article>`;
+}
+const toSec = ts => { const p=ts.split(':').map(Number); return p.length===2?p[0]*60+p[1]:p[0]*3600+p[1]*60+p[2]; };
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+const BARS = 64;
+function transcriptHTML(r){
+  const lastTs = toSec(r.transcript[r.transcript.length-1][0]) + 25;
+  const nowIdx = S.playing || S.t>0 ? r.transcript.reduce((a,s,i)=>toSec(s[0])<=S.t?i:a,-1) : -1;
+  const prog = Math.min(1,S.t/lastTs);
+  let bars=''; for(let i=0;i<BARS;i++){const h=6+Math.round(Math.abs(Math.sin(i*1.7)+Math.sin(i*.43))*6.5);bars+=`<i style="height:${h}px" class="${i/BARS<prog?'on':''}"></i>`;}
+  return `<div class="tr">
+   <div class="player"><button class="play" data-act="play" aria-label="${S.playing?'Pause':'Play'}">${S.playing?I.pause:I.play}</button><div class="wave" aria-hidden="true">${bars}</div><span class="clock tnum">${fmt(S.t)} / ${r.dur}</span></div>
+   ${r.transcript.map(([ts,who,txt],i)=>`<div class="seg${S.hit===r.id+'|'+ts?' hit':''}${i===nowIdx?' now':''}" id="seg-${r.id}-${ts.replace(':','-')}">
+     <button class="time tnum" data-seek="${ts}">${ts}</button><div><div class="who">${av(who)} ${PEOPLE[who].name}</div><p>${esc(txt)}</p></div></div>`).join('')}
+  </div>`;
+}
+function tabIcon(t){ return t.view==='transcript'?I.list:(R(t.rec).kind==='memo'?I.memo:I.doc); }
+function tabLabel(t){ const r=R(t.rec); return t.view==='transcript'?`Transcript · ${r.short.replace('End of week Review','End of week')}`:r.short; }
+function editorHTML(kind){
+  // kind: 'main' or 'side' (split companion)
+  const c = cur();
+  if (!c) return `<section class="panel editor"><div class="empty"><div><p style="margin:0 0 4px;color:var(--t1)">No recording open</p><p style="margin:0">Pick a summary or transcript from the library.</p></div></div></section>`;
+  const view = kind==='side' ? 'transcript' : (S.split && c.view==='transcript' ? 'summary' : c.view);
+  const r = R(c.rec);
+  let tabs;
+  if (kind==='main'){
+    tabs = S.tabs.map((t,i)=>{
+      if (S.split && t.view==='transcript' && t.rec===c.rec) return '';
+      const sel = i===S.active;
+      return `<div class="tab" role="tab" aria-selected="${sel}"><button style="display:flex;gap:8px;align-items:center;height:44px" data-tab="${i}">${tabIcon(t)}<span>${esc(tabLabel(t))}</span></button>${R(t.rec).unread&&!sel?'<span class="dot" aria-label="New"></span>':`<button class="x" data-close="${i}" aria-label="Close tab">${I.x}</button>`}</div>`;
+    }).join('');
+  } else {
+    tabs = `<div class="tab" role="tab" aria-selected="true"><span style="display:flex;gap:8px;align-items:center;height:44px">${I.list}<span>${esc(tabLabel({rec:c.rec,view:'transcript'}))}</span></span><button class="x" data-act="unsplit" aria-label="Close split">${I.x}</button></div>`;
+  }
+  const tools = kind==='main' ? `<div class="tools"><button class="iconbtn split-toggle" data-act="split" aria-pressed="${S.split}" aria-label="${S.split?'Close split view':'Open transcript beside summary'}">${I.split}</button><button class="iconbtn" data-act="more" aria-label="More">${I.more}</button></div>` : '';
+  const crumbs = `<div class="crumbs"><span>${FOLDERS.find(f=>f.id===r.folder).name}</span><span>›</span><span>${esc(r.short)}</span><span>›</span><b>${view==='summary'?'Summary':'Transcript'}</b></div>`;
+  return `<section class="panel editor" aria-label="${view}"><div class="tabbar"><div class="tabs" role="tablist">${tabs}</div><span class="grow"></span>${tools}</div>${crumbs}<div class="scroll" data-scroll="${kind}">${view==='summary'?summaryHTML(r):transcriptHTML(r)}</div></section>`;
+}
+function renderEditors(keepScroll=true){
+  const el = $('#editors');
+  const prev = {}; if(keepScroll) el.querySelectorAll('[data-scroll]').forEach(s=>prev[s.dataset.scroll]=s.scrollTop);
+  el.classList.toggle('split', S.split);
+  el.innerHTML = editorHTML('main') + (S.split && cur() ? editorHTML('side') : '');
+  el.querySelectorAll('[data-scroll]').forEach(s=>{ if(prev[s.dataset.scroll]!=null) s.scrollTop=prev[s.dataset.scroll]; });
+}
+
+/* ---------------- render: actions ---------------- */
+function actionHTML(a){
+  const exp = S.expanded===a.id && !a.done;
+  return `<div class="act${a.done?' done':''}">
+    <div class="act-top"><button class="check" data-done="${a.id}" role="checkbox" aria-checked="${!!a.done}" aria-label="Mark done">${a.done?I.check:''}</button>
+      <button class="act-top" style="flex:1;min-width:0" data-expand="${a.id}" aria-expanded="${exp}"><span class="appic">${appIcon(a.app)}</span><span class="act-body"><span class="act-title">${esc(a.title)}</span><span class="act-meta">${esc(a.meta)}</span></span>${a.tag&&!a.done?'<span class="tag">New</span>':''}</button></div>
+    ${exp?`<div class="act-details"><span>${I.timer} ${esc(a.details.when)}</span>${a.details.who.length?`<span><span class="stack">${a.details.who.map(p=>av(p)).join('')}</span>&nbsp;${a.details.who.map(p=>PEOPLE[p].name).join(', ')}</span>`:''}<span class="muted">${esc(a.details.note)}</span></div><button class="btn" data-go="${a.id}">${esc(a.cta)}</button>`:''}
+  </div>`;
+}
+function renderActions(){
+  const el = $('#actions');
+  const open = ACTIONS.filter(a=>!a.done).length, done = ACTIONS.length-open;
+  if (!S.actionsOpen && window.innerWidth>900){
+    el.classList.add('collapsed');
+    const apps = ACTIONS.filter(a=>!a.done).slice(0,6);
+    el.innerHTML = `<button class="iconbtn" data-act="expand-actions" aria-label="Show actions">${I.expand}</button><span class="badge tnum" title="${open} open actions">${open}</span><span class="rule"></span>${apps.map(a=>`<button class="mini" data-peek="${a.id}" title="${esc(a.title)}">${appIcon(a.app)}</button>`).join('')}<span style="flex:1"></span><button class="mini" data-act="expand-actions" aria-label="Add an action">${I.plus}</button>`;
+    return;
+  }
+  el.classList.remove('collapsed');
+  const c = cur();
+  let list = ACTIONS.filter(a=> S.filter==='open'?!a.done : S.filter==='done'?a.done : (c && a.rec===c.rec));
+  const groups = [...new Set(list.map(a=>a.rec))];
+  el.innerHTML = `<div class="ap-h"><h2>Actions</h2><span class="count tnum">${ACTIONS.length}</span><span class="grow"></span><button class="iconbtn" data-act="collapse-actions" aria-label="Collapse actions panel">${I.expand}</button></div>
+   <div class="chips" role="group" aria-label="Filter actions">
+     <button class="chip" data-filter="open" aria-pressed="${S.filter==='open'}">Open ${open}</button>
+     <button class="chip" data-filter="done" aria-pressed="${S.filter==='done'}">Done ${done}</button>
+     <button class="chip" data-filter="this" aria-pressed="${S.filter==='this'}">This recording</button></div>
+   <div class="feed">${groups.length?groups.map(g=>{const r=R(g);return `<div class="group"><div class="src">${r.kind==='memo'?I.memo.replace('ico','ico ico-sm'):I.mic.replace('ico','ico ico-sm')}<button data-open="${r.id}:summary">${esc(r.short)}</button><span class="muted tnum">${r.day}</span></div>${list.filter(a=>a.rec===g).map(actionHTML).join('')}</div>`}).join(''):`<div class="empty" style="height:auto;padding-top:48px"><div><p style="margin:0 0 4px;color:var(--t1)">Nothing here</p><p style="margin:0">${S.filter==='done'?'Actions you complete show up here.':'All actions for this recording are done.'}</p></div></div>`}</div>
+   <div class="composer"><form id="add-form">${I.plus}<input id="add-input" placeholder="Add an action to ${c?esc(R(c.rec).short):'this recording'}" autocomplete="off"><span class="muted" aria-hidden="true">↵</span></form></div>`;
+}
+
+function renderChrome(){
+  $('#t-sidebar').setAttribute('aria-pressed', S.sidebar);
+  $('#t-actions').setAttribute('aria-pressed', S.actionsOpen);
+  $('#t-split').setAttribute('aria-pressed', S.split);
+  const narrow = window.innerWidth<=900;
+  $('#sidebar').style.display = narrow ? '' : (S.sidebar?'':'none');
+  $('#sidebar').classList.toggle('open', narrow && S.narrowSide);
+  $('#actions').classList.toggle('open', narrow && S.narrowActs);
+  let scrim = $('#drawer-scrim');
+  if (narrow && (S.narrowSide||S.narrowActs)){ if(!scrim){scrim=document.createElement('div');scrim.id='drawer-scrim';scrim.className='drawer-scrim';document.body.appendChild(scrim);scrim.onclick=()=>{S.narrowSide=S.narrowActs=false;renderChrome()}} } else if (scrim) scrim.remove();
+}
+function renderAll(){ renderSidebar(); renderEditors(); renderActions(); renderChrome(); }
+
+/* ---------------- behaviour ---------------- */
+function openView(recId, view){
+  const r=R(recId); r.unread=false;
+  if (S.split && view==='transcript' && cur() && cur().rec===recId){ renderAll(); return; }
+  let i = S.tabs.findIndex(t=>t.rec===recId && t.view===view);
+  if (i<0){ S.tabs.push({rec:recId,view}); i=S.tabs.length-1; }
+  S.active=i; S.openRecs[recId]=true; S.openFolders[r.folder]=true; S.t=0; S.playing=false; stopPlay();
+  if (window.innerWidth<=900) S.narrowSide=false;
+  renderAll();
+}
+function jump(recId, ts){
+  S.hit = recId+'|'+ts; S.t = toSec(ts);
+  if (window.innerWidth>1180 && cur() && cur().view==='summary' && cur().rec===recId){ S.split = true; renderAll(); }
+  else openView(recId,'transcript');
+  requestAnimationFrame(()=>{ const seg=document.getElementById(`seg-${recId}-${ts.replace(':','-')}`); if(seg) seg.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); });
+}
+let timer=null;
+function stopPlay(){ clearInterval(timer); timer=null; }
+function togglePlay(){
+  S.playing=!S.playing;
+  if (S.playing){ timer=setInterval(()=>{ S.t+=1; const r=R(cur().rec); const end=toSec(r.transcript[r.transcript.length-1][0])+25; if(S.t>=end){S.playing=false;stopPlay();} renderEditors(); },250); }
+  else stopPlay();
+  renderEditors();
+}
+let toastT;
+function toast(msg){ let t=$('#toast'); if(!t){t=document.createElement('div');t.id='toast';t.className='toast';t.setAttribute('role','status');document.body.appendChild(t);} t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2600); }
+
+document.addEventListener('click', e=>{
+  const b = e.target.closest('button,[data-folder]'); if(!b) return;
+  const d = b.dataset;
+  if (d.folder){ S.openFolders[d.folder]=!S.openFolders[d.folder]; renderSidebar(); }
+  else if (d.rec){ S.openRecs[d.rec]=!S.openRecs[d.rec]; renderSidebar(); }
+  else if (d.open){ const [r,v]=d.open.split(':'); openView(r,v); }
+  else if (d.person){ const p=PEOPLE[d.person]; const n=REC.filter(r=>r.people.includes(d.person)).map(r=>r.short); toast(`${p.name} speaks in ${n.length} recording${n.length===1?'':'s'}: ${n.slice(0,3).join(', ')}${n.length>3?'…':''}`); }
+  else if (d.rail){ S.rail=d.rail; renderSidebar(); }
+  else if (d.tab!=null){ S.active=+d.tab; R(S.tabs[S.active].rec).unread=false; S.t=0; S.playing=false; stopPlay(); renderAll(); }
+  else if (d.close!=null){ const i=+d.close; S.tabs.splice(i,1); if(S.active>=S.tabs.length) S.active=S.tabs.length-1; else if(i<S.active) S.active--; if(!S.tabs.length){S.active=0;S.split=false} renderAll(); }
+  else if (d.ts){ const [r,ts]=d.ts.split('|'); jump(r,ts); }
+  else if (d.seek){ S.t=toSec(d.seek); S.hit=null; renderEditors(); }
+  else if (d.filter){ S.filter=d.filter; renderActions(); }
+  else if (d.expand){ const id=+d.expand; S.expanded = S.expanded===id?null:id; renderActions(); }
+  else if (d.done){ const a=ACTIONS.find(x=>x.id===+d.done); a.done=!a.done; renderActions(); toast(a.done?`Marked done: ${a.title}`:`Reopened: ${a.title}`); }
+  else if (d.go){ const a=ACTIONS.find(x=>x.id===+d.go); toast(`Would open ${APPS[a.app].name} with “${a.title}” filled in`); }
+  else if (d.peek){ S.actionsOpen=true; S.filter='open'; S.expanded=+d.peek; renderActions(); renderChrome(); }
+  else if (d.act){
+    switch(d.act){
+      case 'play': togglePlay(); break;
+      case 'split': S.split=!S.split; if(S.split && cur().view==='transcript'){ const i=S.tabs.findIndex(t=>t.rec===cur().rec&&t.view==='summary'); if(i>=0) S.active=i; else {S.tabs.push({rec:cur().rec,view:'summary'});S.active=S.tabs.length-1;} } renderAll(); break;
+      case 'unsplit': S.split=false; renderAll(); break;
+      case 'collapse-actions': S.actionsOpen=false; renderActions(); renderChrome(); break;
+      case 'expand-actions': S.actionsOpen=true; renderActions(); renderChrome(); break;
+      case 'record': toast('Recording starts on your Logi Zone Vibe 100'); break;
+      case 'settings': toast('Settings are not part of this prototype'); break;
+      case 'more': toast('More options are not part of this prototype'); break;
+    }
+  }
+});
+$('#t-sidebar').onclick = ()=>{ S.sidebar=!S.sidebar; renderChrome(); };
+$('#t-actions').onclick = ()=>{ S.actionsOpen=!S.actionsOpen; renderActions(); renderChrome(); };
+$('#t-split').onclick = ()=>{ if(cur()){ document.querySelector('[data-act="split"]')?.click(); } };
+$('#open-sidebar').onclick = ()=>{ S.narrowSide=!S.narrowSide; S.narrowActs=false; renderChrome(); };
+$('#open-actions').onclick = ()=>{ S.narrowActs=!S.narrowActs; S.narrowSide=false; renderActions(); renderChrome(); };
+$('#t-theme').onclick = ()=>{ const dark = getComputedStyle(document.documentElement).getPropertyValue('--canvas').trim()==='#1b1b1b'; S.theme = dark?'light':'dark'; document.documentElement.dataset.theme=S.theme; store.set('theme',S.theme); };
+document.addEventListener('submit', e=>{
+  if (e.target.id!=='add-form') return; e.preventDefault();
+  const v = $('#add-input').value.trim(); if(!v || !cur()) return;
+  ACTIONS.unshift({id:nextId++,rec:cur().rec,app:'tasks',title:v,meta:'Tasks · you',tag:true,cta:'Open in Tasks',details:{when:'No due date',who:[],note:'Added by you'}});
+  S.filter='open'; renderActions(); toast('Action added'); setTimeout(()=>$('#add-input')?.focus(),0);
+});
+
+/* ---------------- command palette ---------------- */
+function palette(){
+  const layer=$('#layer');
+  layer.innerHTML = `<div class="scrim" id="scrim"><div class="palette" role="dialog" aria-label="Search"><div class="in">${I.search}<input id="pal-q" placeholder="Search recordings, transcripts and actions" autocomplete="off"><span class="kbd">esc</span></div><ul id="pal-list" role="listbox"></ul></div></div>`;
+  const q=$('#pal-q'); let sel=0, items=[];
+  const draw=()=>{
+    const s=q.value.trim().toLowerCase();
+    items=[];
+    for(const r of REC){ if(!s||r.title.toLowerCase().includes(s)) items.push({k:'Recording',label:r.title,icon:r.kind==='memo'?I.memo:I.mic,go:()=>openView(r.id,'summary')});
+      if(s) for(const [ts,who,txt] of r.transcript) if(txt.toLowerCase().includes(s)) items.push({k:`${r.short} · ${ts}`,label:txt,icon:I.list,go:()=>jump(r.id,ts)}); }
+    for(const a of ACTIONS){ if(!s||a.title.toLowerCase().includes(s)) items.push({k:'Action',label:a.title,icon:appIcon(a.app),go:()=>{S.actionsOpen=true;S.filter=a.done?'done':'open';S.expanded=a.id;if(window.innerWidth<=900)S.narrowActs=true;renderActions();renderChrome();}}); }
+    items=items.slice(0,9); sel=Math.min(sel,Math.max(0,items.length-1));
+    $('#pal-list').innerHTML = items.length?items.map((it,i)=>`<li><button data-i="${i}" role="option" aria-selected="${i===sel}">${it.icon}<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(it.label)}</span><span class="k">${esc(it.k)}</span></button></li>`).join(''):`<li class="muted" style="padding:12px">No matches for “${esc(q.value)}”</li>`;
+  };
+  const close=()=>{layer.innerHTML='';};
+  const pick=i=>{const it=items[i]; close(); it&&it.go();};
+  q.oninput=()=>{sel=0;draw()};
+  q.onkeydown=e=>{ if(e.key==='ArrowDown'){sel=Math.min(sel+1,items.length-1);draw();e.preventDefault()} else if(e.key==='ArrowUp'){sel=Math.max(sel-1,0);draw();e.preventDefault()} else if(e.key==='Enter'){pick(sel)} else if(e.key==='Escape'){close()} };
+  $('#scrim').onclick=e=>{ if(e.target.id==='scrim') close(); const b=e.target.closest('[data-i]'); if(b) pick(+b.dataset.i); };
+  draw(); q.focus();
+}
+$('#cmd').onclick = palette;
+document.addEventListener('keydown', e=>{ if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){ e.preventDefault(); palette(); } else if(e.key==='Escape' && $('#layer').innerHTML){ $('#layer').innerHTML=''; } });
+let rw; window.addEventListener('resize',()=>{clearTimeout(rw);rw=setTimeout(()=>{ if(window.innerWidth<=1180 && S.split){S.split=false;renderEditors();} renderActions(); renderChrome(); },120)});
+
+renderAll();
+})();
+</script>
+
+</body></html>

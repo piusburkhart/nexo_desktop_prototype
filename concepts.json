@@ -1,0 +1,9 @@
+{
+  "project": "Nexo",
+  "version": "1",
+  "concepts": [
+    { "id": "brief", "label": "Brief", "file": "prototypes/brief.html", "description": "A single \"Today\" view with almost no navigation" },
+    { "id": "feed", "label": "Feed", "file": "prototypes/feed.html", "description": "A timeline of recordings with a connected actions panel" },
+    { "id": "productivity", "label": "Productivity", "file": "prototypes/productivity.html", "description": "A multi-view workspace for managing many recordings" }
+  ]
+}

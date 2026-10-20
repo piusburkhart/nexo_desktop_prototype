@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexo concepts</title>
+<style>
+  :root { --bg:#fff; --fg:#1a1a1a; --muted:#6b6b6b; --line:#e4e4e4; --accent:#1a1a1a; --accent-fg:#fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#161616; --fg:#f0f0f0; --muted:#9a9a9a; --line:#2c2c2c; --accent:#f0f0f0; --accent-fg:#161616; }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body { display: flex; flex-direction: column; font: 13px/1.3 system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+  header { display: flex; align-items: center; gap: 12px; padding: 6px 12px; border-bottom: 1px solid var(--line); flex: none; min-width: 0; }
+  .name { font-weight: 600; }
+  nav { display: flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 8px; flex: none; }
+  nav button { font: inherit; color: var(--muted); background: none; border: 0; border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  nav button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+  nav button:focus-visible { outline: 2px solid #4c8dff; outline-offset: 2px; }
+  #desc { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  main { flex: 1; position: relative; min-height: 0; }
+  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+  iframe[hidden], .msg[hidden] { display: none; }
+  .msg { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 24px; color: var(--muted); }
+  /* Phones: description moves out of the way so the toggle never overflows */
+  @media (max-width: 640px) { #desc { display: none; } header { gap: 8px; } nav button { padding: 4px 8px; } }
+</style>
+</head>
+<body>
+<header>
+  <span class="name" id="name">Nexo</span>
+  <nav id="toggle" aria-label="Concepts"></nav>
+  <span id="desc" aria-live="polite"></span>
+</header>
+<main id="stage"><div class="msg" id="msg" hidden></div></main>
+
+<script>
+(async () => {
+  const toggle = document.getElementById('toggle'), stage = document.getElementById('stage');
+  const msg = document.getElementById('msg'), desc = document.getElementById('desc');
+
+  // All config lives in concepts.json; nothing concept-specific is hardcoded here.
+  let cfg;
+  try { cfg = await (await fetch('concepts.json', { cache: 'no-store' })).json(); }
+  catch { msg.hidden = false; msg.textContent = 'Could not load concepts.json.'; return; }
+  const concepts = cfg.concepts;
+  document.getElementById('name').textContent = cfg.project || 'Nexo';
+
+  const frames = {};   // id -> iframe, created lazily and kept alive after first visit
+  const buttons = {};
+  let current = null;
+
+  concepts.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = c.label; b.title = `${c.label} (${i + 1})`;
+    b.setAttribute('aria-pressed', 'false');
+    b.onclick = () => { location.hash = c.id; };
+    toggle.append(b); buttons[c.id] = b;
+  });
+
+  // Keyboard shortcuts 1..N. Also bound inside same-origin iframes (see load handler).
+  function onKey(e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    const c = concepts[parseInt(e.key, 10) - 1];
+    if (c) location.hash = c.id;
+  }
+  document.addEventListener('keydown', onKey);
+
+  async function open(id) {
+    const c = concepts.find(x => x.id === id) || concepts[0];
+    current = c.id;
+    concepts.forEach(x => buttons[x.id].setAttribute('aria-pressed', String(x.id === c.id)));
+    desc.textContent = c.description; desc.title = c.description;
+    document.title = `${c.label} · ${cfg.project || 'Nexo'}`;
+    Object.entries(frames).forEach(([k, f]) => f.hidden = k !== c.id);
+    msg.hidden = true;
+    if (frames[c.id]) return;
+
+    // iframes don't expose 404s, so check the file exists first.
+    // Swapped files: bump "version" in concepts.json to bypass stale caches.
+    const src = `${c.file}?v=${encodeURIComponent(cfg.version || '')}`;
+    let ok = false;
+    try { ok = (await fetch(src, { method: 'HEAD' })).ok; } catch {}
+    if (current !== c.id) return;              // user switched away while checking
+    if (!ok) {
+      msg.hidden = false;
+      msg.innerHTML = '';
+      msg.append(`The "${c.label}" prototype is missing. Expected file: `);
+      const code = document.createElement('code'); code.textContent = c.file; msg.append(code);
+      return;
+    }
+    const f = document.createElement('iframe');
+    f.title = c.label; f.src = src;
+    f.addEventListener('load', () => {
+      try { f.contentWindow.addEventListener('keydown', onKey); } catch {} // cross-origin: ignore
+    });
+    stage.append(f); frames[c.id] = f;
+  }
+
+  addEventListener('hashchange', () => open(location.hash.slice(1)));
+  // Normalise an empty/unknown hash to the first concept without adding a history entry.
+  const start = concepts.find(c => c.id === location.hash.slice(1)) || concepts[0];
+  if (location.hash.slice(1) !== start.id) history.replaceState(null, '', '#' + start.id);
+  open(start.id);
+})();
+</script>
+</body>
+</html>
