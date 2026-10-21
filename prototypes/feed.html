@@ -131,7 +131,11 @@ svg{display:block}
 .card.hot{translate:0 -2px;scale:1.01}
 .card.hot::after{opacity:1}
 .feed.linking .card:not(.hot){opacity:.58}
-.card .lg{margin-top:var(--s-xl);font-size:18px;line-height:26px}
+.card .lgw{display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows 200ms var(--e-std),opacity 200ms var(--e-std),visibility 0s linear 200ms}
+/* lagom layout: summary rows expand from 0 to their natural height (and collapse back) in 200ms */
+.feed.lagom .card .lgw{grid-template-rows:1fr;opacity:1;visibility:visible;transition-delay:0s}
+.card .lg{min-height:0;overflow:hidden;font-size:18px;line-height:26px}
+.card .lg>div{padding-top:var(--s-xl)}   /* padding lives inside the clipped box so it collapses to 0 too */
 .card .lg p{margin:0 0 var(--s-lg)}
 .card .lg p:last-child{margin-bottom:var(--s-xs)}
 .card .t{font-size:16px;line-height:22px;display:flex;justify-content:space-between;align-items:center;gap:var(--s-lg);margin-bottom:var(--s-sm)}
@@ -490,7 +494,7 @@ function renderFeed(){
     if (!items.length) return '';
     return `<h3 class="sec">${s}</h3><div class="cards">${items.map(r => r.memo
       ? `<div class="card memo" role="button" tabindex="0" data-rec="${r.id}" aria-label="Open memo"><div class="ci"><p class="q">${r.text}</p>${metaHTML(r)}</div></div>`
-      : `<div class="card" role="button" tabindex="0" data-rec="${r.id}"><div class="ci"><div class="t"><span>${r.title}</span>${r.isNew?'<span class="tag">New</span>':''}</div>${metaHTML(r)}${state.layout==='lagom'?`<div class="lg">${r.lagom.map(p => `<p>${p}</p>`).join('')}</div>`:''}</div></div>`).join('')}</div>`;
+      : `<div class="card" role="button" tabindex="0" data-rec="${r.id}"><div class="ci"><div class="t"><span>${r.title}</span>${r.isNew?'<span class="tag">New</span>':''}</div>${metaHTML(r)}<div class="lgw" aria-hidden="${state.layout!=='lagom'}"><div class="lg"><div>${r.lagom.map(p => `<p>${p}</p>`).join('')}</div></div></div></div></div>`).join('')}</div>`;
   }).join('');
 }
 function aiHTML(a, withSrc){
@@ -880,8 +884,8 @@ $('#seg').addEventListener('click', e => {
   clearTimeout(enterT); clearTimeout(leaveT); setFocus(null);
   state.layout = b.dataset.layout;
   $$('#seg button').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
-  renderFeed();
-  $('#feedList').animate([{opacity:0},{opacity:1}], {duration:D(DUR.std), easing:E_STD});
+  feed.classList.toggle('lagom', state.layout === 'lagom');   // the cards expand/collapse via CSS
+  $$('.card .lgw').forEach(e => e.setAttribute('aria-hidden', state.layout !== 'lagom'));
 });
 addEventListener('resize', () => placePill(true));
 document.fonts && document.fonts.ready.then(() => placePill(true));
