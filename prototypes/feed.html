@@ -133,7 +133,7 @@ svg{display:block}
 .feed.linking .card:not(.hot){opacity:.58}
 .card .lgw{display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows 200ms var(--e-std),opacity 200ms var(--e-std),visibility 0s linear 200ms}
 /* lagom layout: summary rows expand from 0 to their natural height (and collapse back) in 200ms */
-.feed.lagom .card .lgw{grid-template-rows:1fr;opacity:1;visibility:visible;transition-delay:0s}
+.feed.layout-lagom .card .lgw{grid-template-rows:1fr;opacity:1;visibility:visible;transition-delay:0s}
 .card .lg{min-height:0;overflow:hidden;font-size:18px;line-height:26px}
 .card .lg>div{padding-top:var(--s-xl)}   /* padding lives inside the clipped box so it collapses to 0 too */
 .card .lg p{margin:0 0 var(--s-lg)}
@@ -884,7 +884,7 @@ $('#seg').addEventListener('click', e => {
   clearTimeout(enterT); clearTimeout(leaveT); setFocus(null);
   state.layout = b.dataset.layout;
   $$('#seg button').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
-  feed.classList.toggle('lagom', state.layout === 'lagom');   // the cards expand/collapse via CSS
+  feed.classList.toggle('layout-lagom', state.layout === 'lagom');   // the cards expand/collapse via CSS
   $$('.card .lgw').forEach(e => e.setAttribute('aria-hidden', state.layout !== 'lagom'));
 });
 addEventListener('resize', () => placePill(true));
