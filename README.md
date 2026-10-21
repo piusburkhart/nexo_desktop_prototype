@@ -37,7 +37,7 @@ Import the GitHub repo in Vercel, framework preset **Other**, no build command, 
 
 ## Password
 
-`middleware.js` protects the whole site with a password with a password-only form (no username). Change `PASSWORD` in that file, or set a `SITE_PASSWORD` environment variable in Vercel. It only runs on Vercel, not with `npx serve` or `python3 -m http.server`.
+`middleware.js` protects the whole site with a password-only form (no username). Change `PASSWORD` in that file, or set a `SITE_PASSWORD` environment variable in Vercel. It only runs on Vercel, not with `npx serve` or `python3 -m http.server`.
 
 ## Notes
 
