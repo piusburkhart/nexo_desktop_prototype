@@ -25,7 +25,6 @@
 
   --shadow-xs:0 4px 12px rgba(0,0,0,.06);
   --shadow-s:0 8px 16px 5px rgba(0,0,0,.02);
-  --shadow-hover:0 6px 18px rgba(0,0,0,.06);
   --shadow-xl:0 11px 25px rgba(0,0,0,.08),0 46px 46px rgba(0,0,0,.07),0 103px 62px rgba(0,0,0,.04),0 183px 73px rgba(0,0,0,.01);
   --shadow-edge:0 1px 0 var(--border-subtle);
 
@@ -89,20 +88,24 @@ svg{display:block}
 .main{flex:1;min-width:0;background:var(--bg-canvas);border-radius:var(--r-2xl);display:flex;overflow:hidden}
 
 /* ---------- sidebar ---------- */
-.side{width:248px;flex:none;border-right:1px solid var(--border-default);padding:var(--s-3xl) var(--s-lg) 0 var(--s-xl);overflow:hidden}
-.feedbtn{height:48px;border-radius:var(--r-full);background:var(--bg-inverse);color:var(--text-inverse);padding:0 var(--s-xl) 0 var(--s-lg);display:inline-flex;gap:var(--s-sm);align-items:center;font-size:16px;line-height:22px}
-.sh{font-size:14px;line-height:17px;color:var(--text-secondary);font-weight:400;margin:var(--s-3xl) 0 var(--s-sm) var(--s-sm)}
+.side{position:relative;width:248px;flex:none;border-right:1px solid var(--border-default);padding:var(--s-3xl) var(--s-lg) 0 var(--s-xl);overflow:hidden}
+.navpill{position:absolute;left:0;top:0;width:0;height:0;border-radius:var(--r-full);background:var(--bg-inverse);pointer-events:none;transition:transform var(--d-std) var(--e-emph),width var(--d-std) var(--e-emph),height var(--d-std) var(--e-emph)}
+.navpill.instant{transition:none}
+.nav{position:relative;z-index:1;display:inline-flex;align-items:center;gap:var(--s-md);height:40px;padding:0 var(--s-lg);border-radius:var(--r-full);font-size:16px;line-height:22px;color:var(--text-primary);white-space:nowrap;transition:color var(--d-fast) var(--e-std),background-color var(--d-fast) var(--e-std)}
+.nav:not(.on) .ic{color:var(--icon-secondary)}
+.nav:hover:not(.on){background:var(--hover)}
+.nav.on{color:var(--text-inverse)}
+.side .nav.on .ic{color:var(--text-inverse)}
+.navrec{height:48px;gap:var(--s-sm);padding:0 var(--s-xl) 0 var(--s-lg)}
+.navrec:not(.on) .ic{color:var(--icon-primary)}
+.fl li{display:block!important;height:auto!important;padding:0!important;background:none!important}
+.sh{font-size:14px;line-height:17px;color:var(--text-secondary);font-weight:400;margin:var(--s-3xl) 0 var(--s-sm) var(--s-lg)}
 .sl{list-style:none;margin:0;padding:0}
-.sl li{display:flex;gap:var(--s-md);align-items:center;height:40px;padding:0 var(--s-sm);border-radius:var(--r-md);font-size:16px;line-height:22px;transition:background-color var(--d-fast) var(--e-std)}
+.sl li{display:flex;gap:var(--s-md);align-items:center;height:40px;padding:0 var(--s-lg);border-radius:var(--r-full);font-size:16px;line-height:22px;transition:background-color var(--d-fast) var(--e-std)}
 .sl li:hover{background:var(--hover)}
-.sl li{cursor:pointer}
 .sl .ic{color:var(--icon-secondary)}
-.sl li.on,.sl li.on:hover{background:var(--bg-inverse);color:var(--text-inverse)}
-.sl li.on .ic{color:var(--text-inverse)}
-.feedbtn.off{background:none;color:var(--text-primary)}
-.feedbtn.off:hover{background:var(--hover)}
 .pav{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:10px;line-height:12px;font-weight:500}
-.seeall{display:inline-block;font-size:12px;line-height:14px;color:var(--text-tertiary);text-decoration:underline;text-underline-offset:3px;margin:var(--s-xs) 0 0 var(--s-sm);cursor:pointer}
+.seeall{display:inline-block;font-size:12px;line-height:14px;color:var(--text-tertiary);text-decoration:underline;text-underline-offset:3px;margin:var(--s-xs) 0 0 var(--s-lg);cursor:pointer}
 
 /* ---------- stage ---------- */
 .stage{flex:1;min-width:0;position:relative}
@@ -112,24 +115,22 @@ svg{display:block}
 .feed.away{visibility:hidden;pointer-events:none}
 .fcol{max-width:548px;margin:0 auto}
 .fh{font-size:28px;line-height:34px;letter-spacing:-.56px;font-weight:400;margin:0 0 var(--s-2xl);min-height:40px;display:flex;align-items:center}
-.fh .ic{width:32px;height:32px;margin-right:var(--s-md);flex:none}
-.card .lg{margin-top:var(--s-xl);font-size:18px;line-height:26px}
-.card .lg p{margin:0 0 var(--s-lg)}
-.card .lg p:last-child{margin-bottom:var(--s-xs)}
+.fh .ic{width:32px;height:32px;margin-right:var(--s-md);flex:none;stroke-width:1.5}
+.fempty{font-size:14px;line-height:17px;color:var(--text-tertiary);margin:0}
 .tools{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s-2xl)}
 .seg{display:flex;background:var(--border-default);border-radius:var(--r-full);padding:var(--s-2xs)}
-.seg button{width:44px;height:32px;border-radius:var(--r-full);display:grid;place-items:center;color:var(--icon-secondary);transition:background-color var(--d-fast) var(--e-std),color var(--d-fast) var(--e-std)}
-.seg button.on{background:var(--bg-surface);color:var(--icon-primary);box-shadow:var(--shadow-xs)}
+.seg span{width:44px;height:32px;border-radius:var(--r-full);display:grid;place-items:center;color:var(--icon-secondary)}
+.seg span.on{background:var(--bg-surface);color:var(--icon-primary);box-shadow:var(--shadow-xs)}
 .seg .ic{width:20px;height:20px}
 .tools .r{display:flex;gap:var(--s-lg);color:var(--icon-primary)}
 .sec{font-size:14px;line-height:17px;color:var(--text-secondary);font-weight:400;margin:0 0 var(--s-md)}
 .cards{display:flex;flex-direction:column;gap:var(--s-md);margin-bottom:var(--s-2xl)}
 .card{position:relative;background:var(--bg-surface);border-radius:var(--r-2xl);padding:var(--s-xl);width:100%;box-shadow:var(--shadow-s);cursor:pointer;outline-offset:3px;transition:translate var(--d-std) var(--e-std),scale var(--d-std) var(--e-std),opacity var(--d-std) var(--e-std)}
 /* elevation is a pre-painted layer that only fades — box-shadow itself never animates */
-.card::after,.ai::after,.ri::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--shadow-hover);opacity:0;pointer-events:none;transition:opacity var(--d-std) var(--e-std)}
-.card.hot{translate:0 -1px}
+.card::after,.ai::after,.ri::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--shadow-xl);opacity:0;pointer-events:none;transition:opacity var(--d-std) var(--e-std)}
+.card.hot{translate:0 -2px;scale:1.01}
 .card.hot::after{opacity:1}
-.feed.linking .card:not(.hot){opacity:.8}
+.feed.linking .card:not(.hot){opacity:.58}
 .card .t{font-size:16px;line-height:22px;display:flex;justify-content:space-between;align-items:center;gap:var(--s-lg);margin-bottom:var(--s-sm)}
 .card.memo{padding:var(--s-2xl) var(--s-xl)}
 .card.memo .q{font-family:var(--font-serif);font-weight:300;font-size:20px;line-height:33px;letter-spacing:-.4px;margin:0 0 var(--s-lg)}
@@ -257,9 +258,9 @@ svg{display:block}
 /* hover link: everything not connected to the focused recording fades like the unhovered cards */
 .ai,.ri,.gh{transition:opacity var(--d-std) var(--e-std),scale var(--d-std) var(--e-std),translate var(--d-std) var(--e-std)}
 .focusing .ai.match,.focusing .ri.match,.focusing .gh.match,.focusing .ai.match::after,.focusing .ri.match::after{transition-delay:calc(var(--mi,0) * 30ms)}
-.focusing .ai:not(.match),.focusing .gh:not(.match),.focusing .ri:not(.match){opacity:.8}
-.focusing .ai.match{translate:-2px 0}
-.focusing .ri.match{scale:1.02}
+.focusing .ai:not(.match),.focusing .gh:not(.match),.focusing .ri:not(.match){opacity:.58}
+.focusing .ai.match{translate:-4px 0}
+.focusing .ri.match{scale:1.04}
 .focusing .ai.match::after,.focusing .ri.match::after{opacity:1}
 
 /* overlays */
@@ -286,9 +287,10 @@ svg{display:block}
   <div class="body">
     <section class="main">
       <nav class="side" aria-label="Library">
-        <button class="feedbtn" id="feedBtn"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Recording</button>
+        <div class="navpill instant" id="navpill"></div>
+        <button class="nav navrec on" id="feedBtn" data-nav="feed"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Recording</button>
         <h2 class="sh">Folders</h2>
-        <ul class="sl" id="folders"></ul>
+        <ul class="sl fl" id="folders"></ul>
         <a class="seeall">see all</a>
         <h2 class="sh people">People</h2>
         <ul class="sl" id="people"></ul>
@@ -297,9 +299,9 @@ svg{display:block}
       <div class="stage" id="stage">
         <div class="view feed" id="feed">
           <div class="fcol">
-            <h1 class="fh" id="fhTitle">Your recording</h1>
+            <h1 class="fh" id="fh">Your recording</h1>
             <div class="tools">
-              <div class="seg" id="seg" role="group" aria-label="Recording layout"><button type="button" data-layout="lagom" aria-pressed="false" aria-label="Summary view"><svg class="ic" viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="5.5" rx="2.5"/><rect x="4.5" y="13.5" width="15" height="5.5" rx="2.5"/></svg></button><button type="button" class="on" data-layout="list" aria-pressed="true" aria-label="List view"><svg class="ic" viewBox="0 0 24 24"><path d="M10 6.5h10M10 12h10M10 17.5h10M5 6.5h.5M5 12h.5M5 17.5h.5"/></svg></button></div>
+              <div class="seg"><span><svg class="ic" viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="5.5" rx="2.5"/><rect x="4.5" y="13.5" width="15" height="5.5" rx="2.5"/></svg></span><span class="on"><svg class="ic" viewBox="0 0 24 24"><path d="M10 6.5h10M10 12h10M10 17.5h10M5 6.5h.5M5 12h.5M5 17.5h.5"/></svg></span></div>
               <div class="r"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5.5h16l-6 7.2V18l-4 1.8v-7.1z"/></svg><svg class="ic" viewBox="0 0 24 24"><path d="M8 4v16M4.5 7.5L8 4l3.5 3.5M16 20V4M12.5 16.5L16 20l3.5-3.5"/></svg></div>
             </div>
             <div id="feedList"></div>
@@ -417,7 +419,7 @@ const RECS = [
       [3,'10:05','Will do. I’ll share a draft tomorrow.']]},
  {id:'memo', sec:'Yesterday', memo:true, text:'Check that every screen answers one question: “where does this send the user next?” If a screen tries to do the work itself, it probably shouldn’t exist.', title:'Memo', short:'this memo', time:'Yesterday 18:05', date:'19 Oct 2026', folder:'Swarovski Optik'},
  {id:'eow', sec:'Yesterday', title:'End of week review', short:'End of week review', time:'Yesterday 14:20', date:'19 Oct 2026', folder:'Logi Nexo', more:2,
-  lagom:['A quiet week. Onboarding is final and ready for handover, and the folder view moves to next sprint.','Two actions came out of this review: hand over onboarding and plan the folder view.'],
+  lagom:['A quiet week. Onboarding is final and ready for handover, and the folder view moves to next sprint.','No new actions came out of this review.'],
   topics:[{h:'Onboarding', subs:[{ps:['The three-question profile flow is final and ready for handover. {1:05}','Copy follows the short, parallel style agreed last month. {2:30}']}]},
           {h:'Folders', subs:[{ps:['The folder view moves to next sprint to keep the focus on search. {4:12}']}]}],
   tx:[[1,'0:10','Quick one today. Let’s go through onboarding and folders.'],
@@ -455,25 +457,16 @@ const ACTS = [
  {id:'a4', rec:'q2', app:'cal', title:'Schedule Q3 planning with Finance'},
  {id:'a5', rec:'q2', app:'cal', title:'Book 30 min with Alex on pricing'},
  {id:'a6', rec:'q2', app:'mail', title:'Follow up with Marketing on the brief'},
- {id:'a8', rec:'above', app:'cal', title:'Plan an action panel review round'},
- {id:'a9', rec:'eow', app:'todo', title:'Hand over onboarding to Engineering'},
- {id:'a10', rec:'eow', app:'cal', title:'Plan the folder view for next sprint'},
- {id:'a11', rec:'memo', app:'todo', title:'Audit every screen for its next step'},
  {id:'d2', rec:'q2', app:'mail', title:'Share Q2 numbers with the board', done:true}
 ];
 const A = Object.fromEntries(ACTS.map(a => [a.id, a]));
-const GROUP_ORDER = ['above','weekly','memo','eow','q2'];
+const GROUP_ORDER = ['above','weekly','q2'];
 
-const state = {view:'feed', rec:null, scope:null, filter:'all', focus:null, collapsed:false, autoCollapsed:false, tx:false, folder:null, folderIdx:null, layout:'list'};
+const state = {view:'feed', folder:null, fscope:false, rec:null, scope:null, filter:'all', focus:null, collapsed:false, autoCollapsed:false, tx:false};
 
 /* ---------------- render ---------------- */
-const FOLDERS = ['Project X','Logi Nexo','Swarovski Optik','Project X'];   // names match the recordings' folder field
-function renderFolders(){
-  $('#folders').innerHTML = FOLDERS.map((f,i) => `<li role="button" tabindex="0" data-i="${i}" class="${state.folderIdx===i?'on':''}" aria-current="${state.folderIdx===i}">${ic('folder')}${f}</li>`).join('');
-  $('#feedBtn').classList.toggle('off', state.folderIdx !== null);
-  $('#fhTitle').innerHTML = state.folder ? ic('folder') + state.folder : 'Your recording';
-}
-renderFolders();
+const FOLDERS = ['Project X','Logi Nexo','Swarovski Optik','Project Y'];
+$('#folders').innerHTML = FOLDERS.map(f => `<li><button class="nav" data-nav="folder" data-folder="${f}">${ic('folder')}${f}</button></li>`).join('');
 $('#people').innerHTML = [['Thuy',AV.T],['Tianyi',AV.K],['Agilan',AV.A]].map(([n,c]) => `<li><span class="pav" style="background:${c[0]};color:${c[1]}">${n[0]}</span>${n}</li>`).join('');
 
 function lnkHTML(r){
@@ -486,13 +479,15 @@ function metaHTML(r){
 }
 function renderFeed(){
   const secs = ['New','Yesterday','Earlier'];
-  if (!RECS.some(r => !state.folder || r.folder === state.folder)) { $('#feedList').innerHTML = '<p class="empty">No recordings in this folder yet.</p>'; return; }
+  const pool = RECS.filter(r => !state.folder || r.folder === state.folder);
+  $('#fh').innerHTML = state.folder ? `${ic('folder')}${state.folder}` : 'Your recording';
+  if (!pool.length) { $('#feedList').innerHTML = `<p class="fempty">No recordings in this folder yet.</p>`; return; }
   $('#feedList').innerHTML = secs.map(s => {
-    const items = RECS.filter(r => r.sec === s && (!state.folder || r.folder === state.folder));
+    const items = pool.filter(r => r.sec === s);
     if (!items.length) return '';
     return `<h3 class="sec">${s}</h3><div class="cards">${items.map(r => r.memo
       ? `<div class="card memo" role="button" tabindex="0" data-rec="${r.id}" aria-label="Open memo"><div class="ci"><p class="q">${r.text}</p>${metaHTML(r)}</div></div>`
-      : `<div class="card" role="button" tabindex="0" data-rec="${r.id}"><div class="ci"><div class="t"><span>${r.title}</span>${r.isNew?'<span class="tag">New</span>':''}</div>${metaHTML(r)}${state.layout==='lagom'?`<div class="lg">${r.lagom.map(p => `<p>${p}</p>`).join('')}</div>`:''}</div></div>`).join('')}</div>`;
+      : `<div class="card" role="button" tabindex="0" data-rec="${r.id}"><div class="ci"><div class="t"><span>${r.title}</span>${r.isNew?'<span class="tag">New</span>':''}</div>${metaHTML(r)}</div></div>`).join('')}</div>`;
   }).join('');
 }
 function aiHTML(a, withSrc){
@@ -504,7 +499,7 @@ function renderActions(){
   let h = `<div class="grp" data-grp="pinned"><div class="gh flip"><span class="l">${ic('pin')}Pinned</span></div>${pinned.map(a => aiHTML(a, true)).join('')}</div>`;
   h += GROUP_ORDER.map(id => {
     const r = R[id];
-    return `<div class="grp" data-grp="${id}"><div class="gh flip"><span class="l">${ic(r.memo?'chat':'wave')}${r.memo?'Memo':r.short}</span><span class="t">${r.time}</span></div>${ACTS.filter(a => a.rec===id && !a.pinned).map(a => aiHTML(a)).join('')}</div>`;
+    return `<div class="grp" data-grp="${id}"><div class="gh flip"><span class="l">${ic('wave')}${r.short}</span><span class="t">${r.time}</span></div>${ACTS.filter(a => a.rec===id && !a.pinned).map(a => aiHTML(a)).join('')}</div>`;
   }).join('');
   h += `<p class="empty flip" id="empty" hidden></p>`;
   $('#list').innerHTML = h;
@@ -520,7 +515,7 @@ function visible(a){
   if (state.filter === 'all' && a.done) return false;
   if (state.filter === 'done' && !a.done) return false;
   if (state.scope && a.rec !== state.scope) return false;
-  if (state.folder && R[a.rec].folder !== state.folder) return false;
+  if (!state.scope && state.folder && state.fscope && R[a.rec].folder !== state.folder) return false;
   return true;
 }
 function applyVis(){
@@ -529,16 +524,18 @@ function applyVis(){
   const n = $$('.ri').filter(e => !e.hidden).length;
   const empty = $('#empty');
   empty.hidden = n > 0;
+  const folderScoped = !state.scope && state.folder && state.fscope;
   empty.textContent = state.scope
     ? (state.filter === 'done' ? 'Nothing marked done in this recording.' : (R[state.scope].memo ? 'No actions from this memo.' : 'No actions from this recording.'))
-    : state.folder ? (state.filter === 'done' ? 'Nothing marked done in this folder.' : 'No actions from this folder.')
-    : (state.filter === 'done' ? 'Nothing marked done yet.' : 'You’re all caught up.');
+    : folderScoped
+      ? (state.filter === 'done' ? 'Nothing marked done in this folder.' : 'No actions in this folder.')
+      : (state.filter === 'done' ? 'Nothing marked done yet.' : 'You’re all caught up.');
   $('#rempty').hidden = n > 0;
   const sc = $('#scopeChip');
-  const lab = state.scope ? (R[state.scope].memo ? 'Memo' : R[state.scope].title) : state.folder;
-  sc.hidden = !lab;
-  if (lab) $('span', sc).textContent = lab;
-  $$('.chip[data-filter]').forEach(c => c.classList.toggle('on', c.dataset.filter === state.filter && !(lab && state.filter === 'all')));
+  sc.hidden = !(state.scope || folderScoped);
+  if (state.scope) $('span', sc).textContent = R[state.scope].memo ? 'Memo' : R[state.scope].title;
+  else if (folderScoped) $('span', sc).textContent = state.folder;
+  $$('.chip[data-filter]').forEach(c => c.classList.toggle('on', c.dataset.filter === state.filter && !((state.scope || folderScoped) && state.filter === 'all')));
   setBadge(state.focus ? matchCount() : n);
 }
 function matchCount(){ return $$('.ri.match').filter(e => !e.hidden).length; }
@@ -709,9 +706,9 @@ $('#rlist').addEventListener('scroll', () => tip.classList.remove('show'));
 /* ---------------- chips ---------------- */
 $('#chips').addEventListener('click', e => {
   const ch = e.target.closest('.chip'); if (!ch) return;
-  if (ch.id === 'scopeChip') return relayout(() => { if (state.scope) state.scope = null; else applyFolder(null); applyVis(); });
+  if (ch.id === 'scopeChip') return relayout(() => { if (state.scope) state.scope = null; else state.fscope = false; applyVis(); });
   const f = ch.dataset.filter;
-  relayout(() => { if (f === 'all') { state.scope = null; if (state.folder) applyFolder(null); } state.filter = f; list.scrollTop = 0; applyVis(); });
+  relayout(() => { if (f === 'all') { state.scope = null; state.fscope = false; } state.filter = f; list.scrollTop = 0; applyVis(); });
 });
 list.addEventListener('click', e => { const a = e.target.closest('.ai'); if (a) { a.classList.remove('flash'); void a.offsetWidth; a.classList.add('flash'); } });
 
@@ -826,27 +823,58 @@ function goBack(){
 
 $('#backBtn').addEventListener('click', goBack);
 
-/* ---------------- folders + layout ---------------- */
-function applyFolder(i){
+/* ---------------- sidebar navigation: Recording ↔ folders ---------------- */
+const side = $('.side'), navpill = $('#navpill');
+function placePill(instant){
+  const on = $('.nav.on', side); if (!on) return;
+  const sr = side.getBoundingClientRect(), r = on.getBoundingClientRect();
+  navpill.classList.toggle('instant', !!instant);
+  Object.assign(navpill.style, {transform:`translate(${r.left - sr.left}px,${r.top - sr.top + side.scrollTop}px)`, width:r.width+'px', height:r.height+'px'});
+  if (instant) { void navpill.offsetWidth; navpill.classList.remove('instant'); }
+}
+function setNav(){
+  $$('.nav', side).forEach(b => b.classList.toggle('on', state.folder ? b.dataset.folder === state.folder : b.dataset.nav === 'feed'));
+  placePill(false);
+}
+function exitDetail(){
+  // leave a recording instantly when the user jumps to another place in the sidebar
+  ++nav; settleNav();
+  if (state.tx) closeTx(true);
+  detail.hidden = true; feed.classList.remove('away');
+  state.view = 'feed'; state.rec = null; state.scope = null;
+}
+let listTok = 0;
+function go(folder){
+  if (state.view === 'detail') exitDetail();
+  else if (folder === state.folder) return;
+  const my = ++listTok;
+  clearTimeout(enterT); clearTimeout(leaveT); clearTimeout(scrollT);
   setFocus(null);
-  state.folderIdx = i; state.folder = i === null ? null : FOLDERS[i];
-  renderFolders(); renderFeed(); feed.scrollTop = 0;
+  state.folder = folder; state.fscope = !!folder;
+  setNav();
+  const col = $('.fcol');
+  col.getAnimations().forEach(a => a.cancel());
+  col.animate([{opacity:1},{opacity:0}], {duration:D(DUR.fast), easing:E_STD, fill:'forwards'}).onfinish = () => {
+    if (my !== listTok) return;
+    renderFeed(); feed.scrollTop = 0;
+    col.getAnimations().forEach(a => a.cancel());
+    [$('#fh'), $('.tools'), ...$$('#feedList > *, #feedList .card')].forEach((e, i) => {
+      if (e.classList.contains('cards')) return;
+      e.animate([{opacity:0, transform:'translateY(8px)'},{opacity:1, transform:'none'}], {duration:D(DUR.std), delay:D(Math.min(i, 8) * 30), easing:E_STD, fill:'backwards'});
+    });
+  };
+  requestAnimationFrame(() => { if (my === listTok) relayout(() => { list.scrollTop = 0; applyVis(); }); });
 }
-function openFolder(i){
-  if (i === state.folderIdx) { goBack(); return; }      // already here: just leave an open recording
-  const go = () => relayout(() => { state.scope = null; applyFolder(i); list.scrollTop = 0; applyVis(); });
-  if (state.view === 'detail') { goBack(); setTimeout(go, D(DUR.emph + 150)); } else go();   // let the close animation land on the old card first
-}
-$('#feedBtn').addEventListener('click', () => openFolder(null));
-$('#folders').addEventListener('click', e => { const li = e.target.closest('li[data-i]'); if (li) openFolder(+li.dataset.i); });
-$('#folders').addEventListener('keydown', e => { const li = e.target.closest('li[data-i]'); if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openFolder(+li.dataset.i); } });
-$('#seg').addEventListener('click', e => {
-  const b = e.target.closest('button[data-layout]'); if (!b || b.dataset.layout === state.layout) return;
-  setFocus(null); state.layout = b.dataset.layout;
-  $$('#seg button').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
-  renderFeed();
-  $('#feedList').animate([{opacity:0},{opacity:1}], {duration:D(DUR.std), easing:E_STD});
+$('#feedBtn').addEventListener('click', () => { if (state.view === 'detail' && !state.folder) goBack(); else go(null); });
+$('#folders').addEventListener('click', e => {
+  const b = e.target.closest('.nav'); if (!b) return;
+  const f = b.dataset.folder;
+  if (state.view === 'detail' && state.folder === f) goBack(); else go(f);
 });
+addEventListener('resize', () => placePill(true));
+document.fonts && document.fonts.ready.then(() => placePill(true));
+placePill(true);
+
 
 /* ---------------- transcription ---------------- */
 let hitT = 0;
